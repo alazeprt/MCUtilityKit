@@ -3,10 +3,9 @@ package com.alazeprt.minecraftutils.util;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.concurrent.*;
 
 public class DownloadUtil {
-    public static void download(String url, String path, int threadCount) {
+    public static void multi(String url, String path, int threadCount) {
         try {
             URL downloadUrl = new URL(url);
             HttpURLConnection connection = (HttpURLConnection) downloadUrl.openConnection();
@@ -71,6 +70,31 @@ public class DownloadUtil {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    public static void single(String url, String path) {
+        try {
+            URL downloadUrl = new URL(url);
+            HttpURLConnection connection = (HttpURLConnection) downloadUrl.openConnection();
+            int fileSize = connection.getContentLength();
+            connection.disconnect();
+
+            InputStream inputStream = downloadUrl.openStream();
+            FileOutputStream outputStream = new FileOutputStream(path);
+
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+
+            inputStream.close();
+            outputStream.close();
+
+            System.out.println("Download completed successfully.");
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

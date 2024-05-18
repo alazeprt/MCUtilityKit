@@ -9,6 +9,13 @@ public class VersionTest {
     public void createTest() throws Exception {
         Manifest manifest = new Manifest();
         Version version = manifest.getVersionList().get(0);
-        version.create(new File(".minecraft"));
+        version.create(new File(".minecraft"), 8);
+    }
+
+    @Test
+    public void downloadAssetsTest() throws Exception {
+        Manifest manifest = new Manifest();
+        Version version = manifest.getVersionList().get(0);
+        version.downloadAssets(new File(".minecraft"), 8, 128);
     }
 }
