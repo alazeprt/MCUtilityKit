@@ -1,22 +1,13 @@
 package com.alazeprt.minecraftutils.account;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
-import java.awt.Desktop;
-import java.net.URI;
-
-import org.apache.commons.lang3.Streams.FailableStream;
-import org.apache.hc.client5.http.classic.methods.HttpPost;
-
-import com.alazeprt.minecraftutils.account.Account;
-import com.alazeprt.minecraftutils.account.AccountType;
 import com.alazeprt.minecraftutils.util.HttpUtil;
 import com.alazeprt.minecraftutils.util.UUIDUtil;
 import com.google.gson.Gson;
+
+import java.awt.*;
+import java.net.URI;
+import java.util.List;
+import java.util.*;
 
 public class MicrosoftAccount implements Account {
     private final AccountType type = AccountType.MICROSOFT;

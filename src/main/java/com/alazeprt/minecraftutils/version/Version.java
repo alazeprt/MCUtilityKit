@@ -5,9 +5,11 @@ import com.alazeprt.minecraftutils.util.HttpUtil;
 import com.google.gson.Gson;
 import org.apache.commons.io.FileUtils;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -95,7 +97,6 @@ public record Version(String version, VersionType type, String url, String relea
     }
 
     private void downloadAssets(int assetsThreadCount, Map<String, Map<String, Map<String, Object>>> assetIndex, File assetsFolder) {
-        Gson gson = new Gson();
         ExecutorService executor = Executors.newFixedThreadPool(assetsThreadCount);
         for (Map.Entry<String, Map<String, Object>> asset : assetIndex.get("objects").entrySet()) {
             String assetHash = asset.getValue().get("hash").toString();
@@ -114,6 +115,57 @@ public record Version(String version, VersionType type, String url, String relea
             executor.submit(() -> {
                 DownloadUtil.single("https://resources.download.minecraft.net/" + assetHash.substring(0, 2) + "/" + assetHash,
                         assetFolder.getAbsolutePath() + "/" + assetHash);
+            });
+        }
+        executor.shutdown();
+        try {
+            executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void downloadLibraries(File root, int downloadThreadCount, int librariesThreadCount) throws Exception {
+        Gson gson = new Gson();
+        File librariesFolder = new File(root, "libraries");
+        if(!librariesFolder.exists()) {
+            librariesFolder.mkdirs();
+        }
+        File versionFolder = new File(root, "versions/" + version);
+        if (!versionFolder.exists()) {
+            versionFolder.mkdirs();
+        }
+        List<Map<String, Map<String, Map<String, Object>>>> libraries = (List<Map<String, Map<String, Map<String, Object>>>>)
+                gson.fromJson(new InputStreamReader(new FileInputStream(new File(versionFolder, version + ".json"))), Map.class).get("libraries");
+        ExecutorService executor = Executors.newFixedThreadPool(librariesThreadCount);
+        for(Map<String, Map<String, Map<String, Object>>> library : libraries) {
+            String url = library.get("downloads").get("artifact").get("url").toString();
+            String path = library.get("downloads").get("artifact").get("path").toString();
+            StringBuilder folder = new StringBuilder();
+            for(int i = 0; i <= path.split("/").length - 2; i++) {
+                folder.append(path.split("/")[i]).append("/");
+            }
+            File libraryFolder = new File(librariesFolder, folder.toString());
+            if(!libraryFolder.exists()) {
+                libraryFolder.mkdirs();
+            }
+            if(new File(librariesFolder, path).exists()) {
+                if(HttpUtil.sha1verify(new File(librariesFolder, path), library.get("sha1").toString())) {
+                    continue;
+                }
+            }
+            executor.submit(() -> {
+                try {
+                    DownloadUtil.multi(url, librariesFolder + "/" + path, downloadThreadCount);
+                    if(!HttpUtil.sha1verify(new File(librariesFolder, path), library.get("sha1").toString())) {
+                        DownloadUtil.single(url, librariesFolder + "/" + path);
+                        if(!HttpUtil.sha1verify(new File(librariesFolder, path), library.get("sha1").toString())) {
+                            throw new RuntimeException("The SHA-1 of the library does not match the SHA-1 of the original file!");
+                        }
+                    }
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
             });
         }
         executor.shutdown();

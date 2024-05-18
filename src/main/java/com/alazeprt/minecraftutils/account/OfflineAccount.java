@@ -2,8 +2,6 @@ package com.alazeprt.minecraftutils.account;
 
 import java.util.UUID;
 
-import com.alazeprt.minecraftutils.account.Account;
-
 public class OfflineAccount implements Account {
     private final AccountType type = AccountType.OFFLINE;
 
