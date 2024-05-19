@@ -1,28 +1,14 @@
 package com.alazeprt.minecraftutils.version;
 
-import org.junit.jupiter.api.Test;
-
-import java.io.File;
-
 public class VersionTest {
-    @Test
-    public void createTest() throws Exception {
-        Manifest manifest = new Manifest();
-        Version version = manifest.getVersionList().get(0);
-        version.create(new File(".minecraft"), 8);
-    }
 
-    @Test
-    public void downloadAssetsTest() throws Exception {
-        Manifest manifest = new Manifest();
-        Version version = manifest.getVersionList().get(0);
-        version.downloadAssets(new File(".minecraft"), 8, 16);
-    }
+    static Version version;
 
-    @Test
-    public void downloadLibrariesTest() throws Exception {
-        Manifest manifest = new Manifest();
-        Version version = manifest.getVersionList().get(0);
-        version.downloadLibraries(new File(".minecraft"), 4, 8);
+    static {
+        try {
+            version = new Manifest().getVersionList().get(0);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

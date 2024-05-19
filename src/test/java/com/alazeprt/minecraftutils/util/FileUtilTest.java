@@ -1,6 +1,9 @@
 package com.alazeprt.minecraftutils.util;
 
+import org.junit.jupiter.api.ClassOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestClassOrder;
 
 import java.io.File;
 import java.util.Arrays;
