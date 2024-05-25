@@ -16,23 +16,23 @@ public class InstanceTest {
     @Test
     @Order(1)
     public void createTest() {
-        instance.create(new File(".minecraft"), 8);
+        instance.create(8);
     }
 
     @Test
     @Order(2)
     public void downloadAssetsTest() {
-        instance.downloadAssets(new File(".minecraft"), 8, 16);
+        instance.downloadAssets(8, 16);
     }
 
     @Test
     @Order(3)
     public void downloadLibrariesTest() {
-        instance.downloadLibraries(new File(".minecraft"), 4, 8);
+        instance.downloadLibraries(4, 8);
     }
 
     static {
-        instance = new Instance(VersionTest.version, "test");
+        instance = new Instance(new File(".minecraft"), VersionTest.version, "test");
         BasicStorageTest.basicStorage.addInstance(instance);
     }
 }

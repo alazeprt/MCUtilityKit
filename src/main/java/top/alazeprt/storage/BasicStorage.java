@@ -150,7 +150,7 @@ public class BasicStorage {
             return Result.JSON_SYNTAX_EXCEPTION.setData(e);
         }
         List<Map<String, Object>> instances = (List<Map<String, Object>>) json.getOrDefault("instances", new ArrayList<>());
-        instances.add(Map.of("name", instance.name(), "version", instance.version().version()));
+        instances.add(Map.of("name", instance.name(), "version", instance.version().version(), "root", instance.root().getAbsolutePath()));
         json.put("instances", instances);
         try {
             FileUtils.writeStringToFile(file, gson.toJson(json), StandardCharsets.UTF_8);
@@ -183,7 +183,7 @@ public class BasicStorage {
             if(!versionMap.containsKey(instance.get("version").toString())) {
                 return Result.VERSION_NOT_FOUND.setData(instance.get("version").toString());
             }
-            instanceList.add(new Instance(versionMap.get(instance.get("version")), instance.get("name").toString()));
+            instanceList.add(new Instance(new File(instance.get("root").toString()), versionMap.get(instance.get("version")), instance.get("name").toString()));
         }
         return Result.SUCCESS.setData(instanceList);
     }

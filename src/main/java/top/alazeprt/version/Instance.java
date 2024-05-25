@@ -15,8 +15,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-public record Instance(Version version, String name) {
-    public Result create(File root, int threadCount) {
+public record Instance(File root, Version version, String name) {
+    public Result create(int threadCount) {
         Gson gson = new Gson();
         File versionFolder = new File(root, "versions/" + name);
         if (!versionFolder.exists()) {
@@ -91,7 +91,7 @@ public record Instance(Version version, String name) {
         return Result.SUCCESS;
     }
 
-    public Result downloadAssets(File root, int downloadThreadCount, int assetsThreadCount) {
+    public Result downloadAssets(int downloadThreadCount, int assetsThreadCount) {
         Gson gson = new Gson();
         File versionFolder = new File(root, "versions/" + name);
         if (!versionFolder.exists()) {
@@ -184,7 +184,7 @@ public record Instance(Version version, String name) {
         executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
     }
 
-    public Result downloadLibraries(File root, int downloadThreadCount, int librariesThreadCount) {
+    public Result downloadLibraries(int downloadThreadCount, int librariesThreadCount) {
         Gson gson = new Gson();
         File librariesFolder = new File(root, "libraries");
         if(!librariesFolder.exists()) {

@@ -20,13 +20,13 @@ public class VanillaTest {
     @Test
     @Order(1)
     public void extractNativesTest() {
-        nativesFolder = (String) Vanilla.extractNatives(new File(".minecraft"), instance.name()).getData();
+        nativesFolder = (String) Vanilla.extractNatives(instance).getData();
     }
 
     @Test
     @Order(2)
     public void launchTest() {
-        Vanilla.launch(new Java("C:\\Program Files\\Zulu\\zulu-21\\bin\\java.exe", 21), new File(".minecraft"),
+        Vanilla.launch(new Java("C:\\Program Files\\Zulu\\zulu-21\\bin\\java.exe", 21),
                 instance, (Account) basicStorage.getAccount("test").getData(), nativesFolder);
     }
 

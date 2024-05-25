@@ -17,12 +17,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Vanilla {
-    public static Result extractNatives(File root, String instance) {
+    public static Result extractNatives(Instance instance) {
+        File root = instance.root();
         Gson gson = new Gson();
         Map<String, Object> json = null;
         try {
             json = gson.fromJson(new InputStreamReader(
-                    new FileInputStream(new File(root, "versions/" + instance + "/" + instance + ".json")), StandardCharsets.UTF_8), Map.class);
+                    new FileInputStream(new File(root, "versions/" + instance.name() + "/" + instance.name() + ".json")), StandardCharsets.UTF_8), Map.class);
         } catch (FileNotFoundException e) {
             return Result.FILE_IO_EXCEPTION.setData(e);
         }
@@ -30,7 +31,7 @@ public class Vanilla {
         if(!librariesFolder.exists()) {
             librariesFolder.mkdirs();
         }
-        File versionFolder = new File(root, "versions/" + instance);
+        File versionFolder = new File(root, "versions/" + instance.name());
         if (!versionFolder.exists()) {
             versionFolder.mkdirs();
         }
@@ -103,7 +104,8 @@ public class Vanilla {
         return Result.SUCCESS.setData(new File(versionFolder, folderName).getAbsolutePath());
     }
 
-    public static Result launch(Java java, File root, Instance instance, Account account, String nativesFolder) {
+    public static Result launch(Java java, Instance instance, Account account, String nativesFolder) {
+        File root = instance.root();
         Gson gson = new Gson();
         Map<String, Object> json = null;
         try {
