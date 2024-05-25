@@ -1,5 +1,6 @@
 package top.alazeprt.minecraftutils.game;
 
+import top.alazeprt.minecraftutils.account.Account;
 import top.alazeprt.minecraftutils.account.OfflineAccount;
 import top.alazeprt.minecraftutils.java.Java;
 import org.junit.jupiter.api.MethodOrderer;
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 
 import java.io.File;
 
+import static top.alazeprt.minecraftutils.storage.BasicStorageTest.basicStorage;
 import static top.alazeprt.minecraftutils.version.InstanceTest.instance;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -26,7 +28,7 @@ public class VanillaTest {
     @Order(2)
     public void launchTest() {
         Vanilla.launch(new Java("C:\\Program Files\\Zulu\\zulu-21\\bin\\java.exe", 21), new File(".minecraft"),
-                instance, new OfflineAccount("test"), nativesFolder);
+                instance, (Account) basicStorage.getAccount("test").getData(), nativesFolder);
     }
 
 }

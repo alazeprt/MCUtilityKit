@@ -6,3 +6,4 @@ build
 
 # Test Folder
 .minecraft
+/.minecraftutils.json

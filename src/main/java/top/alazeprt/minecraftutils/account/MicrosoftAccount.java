@@ -23,7 +23,7 @@ public class MicrosoftAccount implements Account {
 
     private String access_token;
 
-    MicrosoftAccount(String name, UUID uuid, String access_token) {
+    public MicrosoftAccount(String name, UUID uuid, String access_token) {
         this.name = name;
     	this.uuid = uuid;
 	    this.access_token = access_token;

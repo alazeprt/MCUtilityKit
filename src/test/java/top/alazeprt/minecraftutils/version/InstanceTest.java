@@ -7,10 +7,12 @@ import org.junit.jupiter.api.TestMethodOrder;
 
 import java.io.File;
 
+import static top.alazeprt.minecraftutils.storage.BasicStorageTest.basicStorage;
+
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class InstanceTest {
 
-    public static Instance instance = new Instance(VersionTest.version, "test");
+    public static Instance instance;
 
     @Test
     @Order(1)
@@ -28,5 +30,10 @@ public class InstanceTest {
     @Order(3)
     public void downloadLibrariesTest() {
         instance.downloadLibraries(new File(".minecraft"), 4, 8);
+    }
+
+    static {
+        instance = new Instance(VersionTest.version, "test");
+        basicStorage.addInstance(instance);
     }
 }
