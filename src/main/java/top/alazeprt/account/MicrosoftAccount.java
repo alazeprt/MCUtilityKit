@@ -48,22 +48,16 @@ public class MicrosoftAccount implements Account {
         return access_token;
     }
 
-    public static String openLogin() {
-        Gson gson = new Gson();
-        Exception exception = null;
+    public static Result openLogin() {
         try {
             Desktop desktop = Desktop.getDesktop();
             desktop.browse(URI.create("https://login.live.com/oauth20_authorize.srf?client_id=00000000402b5328&response_type=code&scope=service%3A%3Auser.auth.xboxlive.com%3A%3AMBI_SSL&redirect_uri=https%3A%2F%2Flogin.live.com%2Foauth20_desktop.srf"));
-        } catch (Exception e) {
-            exception = e;
+        } catch (IOException e) {
+            return Result.NETWORK_IO_EXCEPTION.setData(e);
+        } catch (UnsupportedOperationException e) {
+            return Result.UNSUPPORTED_EXCEPTION.setData(e);
         }
-        if(exception == null) {
-            return gson.toJson(Map.of("status", "success"));
-        } else {
-            return gson.toJson(
-                    Map.of("status", "failed", "exception", "Cannot open URL", "exceptionInfo", exception)
-                    );
-        }
+        return Result.SUCCESS;
     }
 
     public static Result verifyLogin(String url) {

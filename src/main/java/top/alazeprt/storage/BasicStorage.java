@@ -176,7 +176,12 @@ public class BasicStorage {
         List<Map<String, Object>> instances = (List<Map<String, Object>>) json.getOrDefault("instances", new ArrayList<>());
         List<Instance> instanceList = new ArrayList<>();
         Map<String, Version> versionMap = new HashMap<>();
-        for(Version version : manifest.getVersionList()) {
+        Result result = manifest.getVersionList();
+        if(!result.equals(Result.SUCCESS)) {
+            return result;
+        }
+        List<Version> versionList = (List<Version>) result.getData();
+        for(Version version : versionList) {
             versionMap.put(version.version(), version);
         }
         for(Map<String, Object> instance : instances) {

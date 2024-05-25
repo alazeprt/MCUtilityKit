@@ -50,17 +50,21 @@ public class Manifest {
         return manifest;
     }
 
-    public List<Version> getVersionList() {
+    public Result getVersionList() {
         List<Version> versionList = new ArrayList<>();
-        List<Map<String, Object>> versions = (List<Map<String, Object>>) manifest.get("versions");
-        for(Map<String, Object> version : versions) {
-            String id = version.get("id").toString();
-            VersionType type = VersionType.valueOf(version.get("type").toString().toUpperCase());
-            String url = version.get("url").toString();
-            String releaseTime = version.get("releaseTime").toString();
-            Version version1 = new Version(id, type, url, releaseTime);
-            versionList.add(version1);
+        try {
+            List<Map<String, Object>> versions = (List<Map<String, Object>>) manifest.get("versions");
+            for(Map<String, Object> version : versions) {
+                String id = version.get("id").toString();
+                VersionType type = VersionType.valueOf(version.get("type").toString().toUpperCase());
+                String url = version.get("url").toString();
+                String releaseTime = version.get("releaseTime").toString();
+                Version version1 = new Version(id, type, url, releaseTime);
+                versionList.add(version1);
+            }
+        } catch (NullPointerException e) {
+            return Result.MANIFEST_ERROR.setData(manifest);
         }
-        return versionList;
+        return Result.SUCCESS.setData(versionList);
     }
 }
