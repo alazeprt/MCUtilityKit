@@ -1,6 +1,7 @@
 plugins {
     java
     id("com.github.johnrengelman.shadow") version "8.1.1"
+    id("maven-publish")
 }
 
 repositories {
@@ -22,4 +23,49 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            groupId = "top.alazeprt"
+            artifactId = "MCUtilityKit"
+            version = "1.0"
+            from(components["java"])
+            description = "MCUtilityKit, Simplify launching, managing, and customizing, enabling you to effortlessly develop efficient and user-friendly Minecraft tools."
+            pom {
+                developers {
+                    developer {
+                        id.set("alazeprt")
+                        name.set("alazeprt")
+                    }
+                }
+                licenses {
+                    license {
+                        name.set("GNU LESSER GENERAL PUBLIC LICENSE VERSION 3.0")
+                        url.set("https://www.gnu.org/licenses/lgpl-3.0.txt")
+                    }
+                }
+                url.set("https://github.com/alazeprt/MCUtilityKit")
+                scm {
+                    connection.set("scm:git:https://github.com/alazeprt/MCUtilityKit.git")
+                    url.set("https://github.com/alazeprt/MCUtilityKit")
+                    developerConnection.set("scm:git:ssh://github.com/alazeprt/MCUtilityKit.git")
+                }
+                description.set("MCUtilityKit, Simplify launching, managing, and customizing, enabling you to effortlessly develop efficient and user-friendly Minecraft tools.")
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            name = "local"
+            url = file("${buildDir}/repo").toURI()
+        }
+    }
 }
