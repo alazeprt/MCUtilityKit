@@ -8,7 +8,7 @@ repositories {
     mavenCentral() 
 }
 
-version = "1.0-SNAPSHOT"
+version = "1.0"
 
 dependencies {
     implementation("com.google.code.gson:gson:2.10.1")

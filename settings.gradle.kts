@@ -7,4 +7,4 @@
  * in the user manual at https://docs.gradle.org/7.6.4/userguide/multi_project_builds.html
  */
 
-rootProject.name = "MinecraftUtils"
+rootProject.name = "MCUtilityKit"
