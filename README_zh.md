@@ -15,6 +15,37 @@ MCUtilityKit是专为Minecraft启动器开发者和其他Minecraft相关应用�
 - 简化账户管理: 提供身份验证和账户操作实用工具，简化账户管理任务。
 - 跨平台兼容性: 兼容各种平台，包括Windows、macOS和Linux，确保在不同环境中实现无缝集成。
 
+### 使用方式
+
+你需要根据你的构建系统来选择正确的代码添加到你的项目中。
+
+#### Maven (pom.xml):
+```xml
+<dependencies>
+    <dependency>
+        <groupId>top.alazeprt</groupId>
+        <artifactId>MCUtilityKit</artifactId>
+        <version>1.1</version>
+    </dependency>
+</dependencies>
+```
+
+#### Gradle (Groovy DSL, build.gradle): 
+```groovy
+dependencies {
+    implementation 'top.alazeprt:MCUtilityKit:1.1'
+}
+```
+
+#### Gradle (Kotlin DSL, build.gradle.kts):
+```kotlin
+dependencies {
+    implementation("top.alazeprt:MCUtilityKit:1.1")
+}
+```
+
+接着，你可以通过[JavaDoc](https://mcutilitykit.alazeprt.top/)查询它的使用方式
+
 ### 需求
 
 - JDK 17或以上版本

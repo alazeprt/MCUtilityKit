@@ -15,7 +15,38 @@ MCUtilityKit is an essential library tailored for Minecraft launcher developers 
 - Simplified Account Management: Simplify account management tasks with built-in utilities for authentication and account-related operations.
 - Cross-Platform Compatibility: MCUtilityKit is compatible with various platforms, including Windows, macOS, and Linux, ensuring seamless integration across different environments.
 
-## Requirements
+### Usage
+
+You need to choose the right code to add to your project based on your build system.
+
+#### Maven (pom.xml).
+``xml
+<dependencies
+<dependency>
+<groupId>top.alazeprt</groupId>
+<artifactId>MCUtilityKit</artifactId>
+<version>1.1</version>
+</dependency
+</dependencies
+```
+
+#### Gradle (Groovy DSL, build.gradle). 
+```groovy
+dependencies {
+    implementation 'top.alazeprt:MCUtilityKit:1.1'
+}
+```
+
+#### Gradle (Kotlin DSL, build.gradle.kts).
+```kotlin
+dependencies {
+    implementation("top.alazeprt:MCUtilityKit:1.1")
+}
+```
+
+Next, you can look up how it's used via [JavaDoc](https://mcutilitykit.alazeprt.top/)
+
+### Requirements
 
 - JDK version 17 or above
 
