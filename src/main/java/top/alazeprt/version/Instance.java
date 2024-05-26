@@ -15,7 +15,23 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Represents an instance
+ *
+ * @author alazeprt
+ * @version 1.1
+ *
+ * @param name the name of the instance
+ * @param version the version of the instance
+ * @param root the root folder of the instance
+ */
 public record Instance(File root, Version version, String name) {
+    /**
+     * Create an instance
+     *
+     * @param threadCount number of threads used to download client files
+     * @return the result of the operation
+     */
     public Result create(int threadCount) {
         Gson gson = new Gson();
         File versionFolder = new File(root, "versions/" + name);
@@ -91,6 +107,13 @@ public record Instance(File root, Version version, String name) {
         return Result.SUCCESS;
     }
 
+    /**
+     * Download assets
+     *
+     * @param downloadThreadCount number of threads used in downloading the specified asset file
+     * @param assetsThreadCount number of threads divided to download all asset files
+     * @return the result of the operation
+     */
     public Result downloadAssets(int downloadThreadCount, int assetsThreadCount) {
         Gson gson = new Gson();
         File versionFolder = new File(root, "versions/" + name);
@@ -184,6 +207,13 @@ public record Instance(File root, Version version, String name) {
         executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
     }
 
+    /**
+     * Download libraries
+     *
+     * @param downloadThreadCount number of threads used in downloading the specified library file
+     * @param librariesThreadCount number of threads used in downloading all libraries
+     * @return the result of the operation
+     */
     public Result downloadLibraries(int downloadThreadCount, int librariesThreadCount) {
         Gson gson = new Gson();
         File librariesFolder = new File(root, "libraries");

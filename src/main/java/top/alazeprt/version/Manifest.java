@@ -10,28 +10,57 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.*;
 
+/**
+ * Represents a manifest
+ *
+ * @author alazeprt
+ * @version 1.1
+ */
 public class Manifest {
 
     private String url = "https://piston-meta.mojang.com/mc/game/version_manifest.json";
 
     private Map<String, Object> manifest;
 
+    /**
+     * Constructor for a manifest
+     */
     public Manifest() {
 
     }
 
+    /**
+     * Constructor for a manifest
+     *
+     * @param url the url of the manifest
+     */
     public Manifest(String url) {
         this.url = url;
     }
 
+    /**
+     * Set the url of the manifest
+     *
+     * @param url the url of the manifest
+     */
     public void setUrl(String url) {
         this.url = url;
     }
 
+    /**
+     * Get the url of the manifest
+     *
+     * @return the url of the manifest
+     */
     public String getUrl() {
         return url;
     }
 
+    /**
+     * Reload the manifest from the url
+     *
+     * @return the result of the operation
+     */
     public Result reloadData() {
         Gson gson = new Gson();
         String data = null;
@@ -46,10 +75,20 @@ public class Manifest {
         return Result.SUCCESS.setData(this);
     }
 
+    /**
+     * Get the manifest
+     *
+     * @return the manifest
+     */
     public Map<String, Object> getManifest() {
         return manifest;
     }
 
+    /**
+     * Get the version list
+     *
+     * @return the version list
+     */
     public Result getVersionList() {
         List<Version> versionList = new ArrayList<>();
         try {

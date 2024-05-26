@@ -16,7 +16,20 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Represents a vanilla game operation
+ *
+ * @author alazeprt
+ * @version 1.1
+ */
 public class Vanilla {
+
+    /**
+     * Extract native libraries
+     *
+     * @param instance the instance
+     * @return the result of the operation
+     */
     public static Result extractNatives(Instance instance) {
         File root = instance.root();
         Gson gson = new Gson();
@@ -104,6 +117,15 @@ public class Vanilla {
         return Result.SUCCESS.setData(new File(versionFolder, folderName).getAbsolutePath());
     }
 
+    /**
+     * Launch the game
+     *
+     * @param java the java
+     * @param instance the instance
+     * @param account the account
+     * @param nativesFolder the natives folder
+     * @return the result of the operation
+     */
     public static Result launch(Java java, Instance instance, Account account, String nativesFolder) {
         File root = instance.root();
         Gson gson = new Gson();
@@ -254,7 +276,7 @@ public class Vanilla {
             this.account = account;
             this.instance = instance;
             this.launcherName = "MCUtilityKit";
-            this.launcherVersion = "1.0-SNAPSHOT";
+            this.launcherVersion = "1.1";
             this.versionType = launcherName + " " + launcherVersion;
         }
 

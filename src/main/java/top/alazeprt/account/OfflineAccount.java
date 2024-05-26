@@ -2,6 +2,12 @@ package top.alazeprt.account;
 
 import java.util.UUID;
 
+/**
+ * Represents an offline account
+ *
+ * @author alazeprt
+ * @version 1.1
+ */
 public class OfflineAccount implements Account {
     private final AccountType type = AccountType.OFFLINE;
 
@@ -9,15 +15,27 @@ public class OfflineAccount implements Account {
 
     private final UUID uuid;
 
+    /**
+     * Constructor for offline account
+     *
+     * @param name the name of the account
+     */
     public OfflineAccount(String name) {
         this.name = name;
         this.uuid = UUID.randomUUID();
     }
 
+    /**
+     * Constructor for offline account
+     *
+     * @param name the name of the account
+     * @param uuid the uuid of the account
+     */
     public OfflineAccount(String name, UUID uuid) {
         this.name = name;
         this.uuid = uuid;
     }
+
 
     @Override
     public String getName() {
@@ -34,6 +52,11 @@ public class OfflineAccount implements Account {
         return type;
     }
 
+    /**
+     * Set the name of the account
+     *
+     * @param name the name to set
+     */
     public void setName(String name) {
         this.name = name;
     }

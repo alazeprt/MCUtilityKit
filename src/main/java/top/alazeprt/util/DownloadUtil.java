@@ -7,7 +7,24 @@ import java.io.RandomAccessFile;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+/**
+ * Represents a utility class for downloading files
+ *
+ * @author alazeprt
+ * @version 1.1
+ */
 public class DownloadUtil {
+
+    /**
+     * Download a file using multiple threads
+     *
+     * @param url the url of the file
+     * @param path the path of the file
+     * @param threadCount the number of threads to download
+     * @throws InterruptedException if the thread is interrupted
+     * @throws IOException if an I/O error occurs
+     * @throws RuntimeException if an error occurs
+     */
     public static void multi(String url, String path, int threadCount) throws InterruptedException, IOException, RuntimeException {
         URL downloadUrl = new URL(url);
         HttpURLConnection connection = (HttpURLConnection) downloadUrl.openConnection();
@@ -71,6 +88,13 @@ public class DownloadUtil {
         }
     }
 
+    /**
+     * Download a file using a single thread
+     *
+     * @param url the url of the file
+     * @param path the path of the file
+     * @throws IOException if an I/O error occurs
+     */
     public static void single(String url, String path) throws IOException {
         URL downloadUrl = new URL(url);
         HttpURLConnection connection = (HttpURLConnection) downloadUrl.openConnection();

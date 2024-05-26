@@ -25,7 +25,25 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Represents HTTP utilities
+ *
+ * @author alazeprt
+ * @version 1.1
+ */
 public class HttpUtil {
+
+    /**
+     * Send a POST request
+     *
+     * @param url target for sending POST request
+     * @param data data to be sent
+     * @param headers headers to be sent
+     * @param encodeUrl Whether the request is accompanied by the request header x-www-form-urlencoded
+     * @return response data
+     * @throws IOException if an I/O error occurs
+     * @throws ParseException if the response could not be parsed
+     */
     public static String sendPost(String url, Map<String, Object> data, Map<String, String> headers, boolean encodeUrl) throws IOException, ParseException {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpPost post = new HttpPost(url);
@@ -55,6 +73,15 @@ public class HttpUtil {
         return null;
     }
 
+    /**
+     * Check whether the SHA-1 of the file is the same as the origin SHA-1
+     *
+     * @param path file path
+     * @param origin_sha1 origin SHA-1
+     * @return whether the SHA-1 of the file is the same as the origin SHA-1
+     * @throws NoSuchAlgorithmException if the specified algorithm is not available
+     * @throws IOException if an I/O error occurs
+     */
     public static boolean sha1verify(File path, String origin_sha1) throws NoSuchAlgorithmException, IOException {
         MessageDigest sha1 = MessageDigest.getInstance("SHA-1");
         FileInputStream fis = new FileInputStream(path);
@@ -76,6 +103,17 @@ public class HttpUtil {
         return origin_sha1.contentEquals(sb);
     }
 
+    /**
+     * Send a GET request
+     *
+     * @param url target for sending GET request
+     * @param data data to be sent
+     * @param headers headers to be sent
+     * @return response data
+     * @throws IOException if an I/O error occurs
+     * @throws ParseException if the response could not be parsed
+     * @throws URISyntaxException if the target URL is invalid
+     */
     public static String sendGet(String url, Map<String, Object> data, Map<String, String> headers) throws IOException, ParseException, URISyntaxException {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             URIBuilder uriBuilder = new URIBuilder(url);

@@ -18,18 +18,38 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+/**
+ * Represents the default data store
+ *
+ * @author alazeprt
+ * @version 1.1
+ */
 public class BasicStorage {
 
     private final File file;
 
+    /**
+     * Constructor for BasicStorage
+     * Data is stored in .mcutilitykit.json by default
+     */
     public BasicStorage() {
         this.file = new File(".mcutilitykit.json");
     }
 
+    /**
+     * Constructor for BasicStorage
+     *
+     * @param file the file to store the data
+     */
     public BasicStorage(File file) {
         this.file = file;
     }
 
+    /**
+     * Create the data file
+     *
+     * @return the result of the operation
+     */
     public Result create() {
         Gson gson = new Gson();
         if(file.exists()) {
@@ -49,6 +69,12 @@ public class BasicStorage {
         return Result.SUCCESS;
     }
 
+    /**
+     * Save an account to the data file
+     *
+     * @param account the account to save
+     * @return the result of the operation
+     */
     public Result saveAccount(Account account) {
         Gson gson = new Gson();
         if(!file.exists()) {
@@ -78,6 +104,12 @@ public class BasicStorage {
         return Result.SUCCESS;
     }
 
+    /**
+     * Get an account from the data file
+     *
+     * @param name the name of the account
+     * @return the result of the operation
+     */
     public Result getAccount(String name) {
         Gson gson = new Gson();
         if(!file.exists()) {
@@ -107,6 +139,12 @@ public class BasicStorage {
         return Result.ACCOUNT_NOT_FOUND;
     }
 
+    /**
+     * Remove an account from the data file
+     *
+     * @param name the name of the account
+     * @return the result of the operation
+     */
     public Result removeAccount(String name) {
         Gson gson = new Gson();
         if(!file.exists()) {
@@ -136,6 +174,12 @@ public class BasicStorage {
         return Result.SUCCESS;
     }
 
+    /**
+     * Add an instance to the data file
+     *
+     * @param instance the instance to add
+     * @return the result of the operation
+     */
     public Result addInstance(Instance instance) {
         Gson gson = new Gson();
         if(!file.exists()) {
@@ -160,6 +204,12 @@ public class BasicStorage {
         return Result.SUCCESS;
     }
 
+    /**
+     * Get all instances from the data file
+     *
+     * @param manifest the manifest that used to construct version information
+     * @return the result of the operation
+     */
     public Result getInstances(Manifest manifest) {
         Gson gson = new Gson();
         if(!file.exists()) {
@@ -186,13 +236,19 @@ public class BasicStorage {
         }
         for(Map<String, Object> instance : instances) {
             if(!versionMap.containsKey(instance.get("version").toString())) {
-                return Result.VERSION_NOT_FOUND.setData(instance.get("version").toString());
+                return Result.INSTANCE_NOT_FOUND.setData(instance.get("version").toString());
             }
             instanceList.add(new Instance(new File(instance.get("root").toString()), versionMap.get(instance.get("version")), instance.get("name").toString()));
         }
         return Result.SUCCESS.setData(instanceList);
     }
 
+    /**
+     * Remove an instance from the data file
+     *
+     * @param name the name of the instance
+     * @return the result of the operation
+     */
     public Result removeInstance(String name) {
         Gson gson = new Gson();
         if (!file.exists()) {

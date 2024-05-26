@@ -9,7 +9,7 @@ repositories {
     mavenCentral() 
 }
 
-version = "1.0"
+version = "1.1"
 
 dependencies {
     implementation("com.google.code.gson:gson:2.10.1")
@@ -35,7 +35,7 @@ publishing {
         create<MavenPublication>("maven") {
             groupId = "top.alazeprt"
             artifactId = "MCUtilityKit"
-            version = "1.0"
+            version = "1.1"
             from(components["java"])
             description = "MCUtilityKit, Simplify launching, managing, and customizing, enabling you to effortlessly develop efficient and user-friendly Minecraft tools."
             pom {

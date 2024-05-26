@@ -15,4 +15,23 @@ MCUtilityKit is an essential library tailored for Minecraft launcher developers 
 - Simplified Account Management: Simplify account management tasks with built-in utilities for authentication and account-related operations.
 - Cross-Platform Compatibility: MCUtilityKit is compatible with various platforms, including Windows, macOS, and Linux, ensuring seamless integration across different environments.
 
-Whether you're an experienced developer or just embarking on your journey in Minecraft application development, MCUtilityKit equips you with the tools needed to create efficient and user-friendly Minecraft launcher applications and utilities.
+## Requirements
+
+- JDK version 17 or above
+
+### Building
+
+MCUtilityKit uses Gradle to build the project:
+
+```bash
+./gradlew clean build
+``` 
+
+You will need JDK 17 to build this project.
+
+### License
+
+MCUtilityKit is released under the [LGPL-3.0 license](https://www.gnu.org/licenses/lgpl-3.0.txt).
+
+### Contributors
+- [alazeprt](https://github.com/alazeprt)

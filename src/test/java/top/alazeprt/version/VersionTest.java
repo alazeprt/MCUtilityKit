@@ -1,5 +1,7 @@
 package top.alazeprt.version;
 
+import top.alazeprt.util.Result;
+
 import java.util.List;
 
 public class VersionTest {
@@ -8,7 +10,9 @@ public class VersionTest {
 
     static {
         try {
-            version = ((List<Version>) ((Manifest) new Manifest().reloadData().getData()).getVersionList().getData()).get(0);
+            Result result = new Manifest().reloadData();
+            List<Version> versionList = (List<Version>) ((Manifest) result.getData()).getVersionList().getData();
+            version = versionList.get(0);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

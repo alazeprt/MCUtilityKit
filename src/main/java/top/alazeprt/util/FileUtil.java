@@ -9,8 +9,20 @@ import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+/**
+ * Represents a utility class for file operations
+ *
+ * @author alazeprt
+ * @version 1.1
+ */
 public class FileUtil {
 
+    /**
+     * Search for executable java files in the given roots
+     *
+     * @param roots folders to search
+     * @return found java files
+     */
     public static List<File> searchForJavaw(List<File> roots) {
         List<File> files = new ArrayList<>();
         for (File root : roots) {
@@ -38,7 +50,7 @@ public class FileUtil {
             for (File file : files) {
                 if (file.isDirectory()) {
                     queue.offer(file);
-                } else if (System.getProperty("os.name").toLowerCase().contains("windows") && file.getName().equals("javaw.exe")) {
+                } else if (System.getProperty("os.name").toLowerCase().contains("windows") && file.getName().equals("java.exe")) {
                     list.add(file);
                 } else if (file.getName().equals("java")) {
                     list.add(file);
@@ -48,6 +60,14 @@ public class FileUtil {
         return list;
     }
 
+    /**
+     * Extract files with a specific extension from a jar file
+     *
+     * @param jarFilePath path to the jar file
+     * @param targetDirectory folder to extract the files
+     * @param fileExtension extension of the files
+     * @throws IOException if an I/O error occurs
+     */
     public static void searchAndExtractFiles(String jarFilePath, String targetDirectory, String fileExtension) throws IOException {
         try (JarFile jarFile = new JarFile(jarFilePath)) {
             Enumeration<JarEntry> entries = jarFile.entries();

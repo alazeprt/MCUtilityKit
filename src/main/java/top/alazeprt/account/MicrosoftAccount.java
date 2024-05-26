@@ -14,6 +14,12 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.*;
 
+/**
+ * Represents a Microsoft account
+ *
+ * @author alazeprt
+ * @version 1.1
+ */
 public class MicrosoftAccount implements Account {
     private final AccountType type = AccountType.MICROSOFT;
 
@@ -23,6 +29,13 @@ public class MicrosoftAccount implements Account {
 
     private String access_token;
 
+    /**
+     * Constructor for Microsoft account
+     *
+     * @param name the name of the account
+     * @param uuid the uuid of the account
+     * @param access_token the access token of the account
+     */
     public MicrosoftAccount(String name, UUID uuid, String access_token) {
         this.name = name;
     	this.uuid = uuid;
@@ -44,10 +57,20 @@ public class MicrosoftAccount implements Account {
         return uuid;
     }
 
+    /**
+     * Get access token of the account
+     *
+     * @return the access token
+     */
     public String getAccess_token() {
         return access_token;
     }
 
+    /**
+     * Open the Microsoft account login page for the user
+     *
+     * @return the result of the operation
+     */
     public static Result openLogin() {
         try {
             Desktop desktop = Desktop.getDesktop();
@@ -60,6 +83,12 @@ public class MicrosoftAccount implements Account {
         return Result.SUCCESS;
     }
 
+    /**
+     * Verify the login of the Microsoft account
+     *
+     * @param url the url that get at the end of the login
+     * @return the result of the operation
+     */
     public static Result verifyLogin(String url) {
         Gson gson = new Gson();
         String[] arguments = url.split("\\?")[1].split("&");
