@@ -1,6 +1,7 @@
 package top.alazeprt.util;
 
 import org.apache.commons.io.FileUtils;
+import org.tinylog.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -69,12 +70,12 @@ public class FileUtil {
      * @throws IOException if an I/O error occurs
      */
     public static void searchAndExtractFiles(String jarFilePath, String targetDirectory, String fileExtension) throws IOException {
+        Logger.info("Extracting files from " + jarFilePath);
         try (JarFile jarFile = new JarFile(jarFilePath)) {
             Enumeration<JarEntry> entries = jarFile.entries();
             while (entries.hasMoreElements()) {
                 JarEntry entry = entries.nextElement();
                 if (!entry.isDirectory() && entry.getName().endsWith(fileExtension)) {
-                    System.out.println("Extracting file: " + entry.getName());
                     extractFile(jarFile, entry, targetDirectory);
                 }
             }
@@ -82,6 +83,7 @@ public class FileUtil {
     }
 
     private static void extractFile(JarFile jarFile, JarEntry entry, String targetDirectory) throws IOException {
+        Logger.debug("Extracting " + entry.getName());
         File targetDir = new File(targetDirectory);
         if (!targetDir.exists()) {
             targetDir.mkdirs();

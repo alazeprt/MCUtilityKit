@@ -14,6 +14,7 @@ import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.apache.hc.core5.net.URIBuilder;
+import org.tinylog.Logger;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -45,6 +46,7 @@ public class HttpUtil {
      * @throws ParseException if the response could not be parsed
      */
     public static String sendPost(String url, Map<String, Object> data, Map<String, String> headers, boolean encodeUrl) throws IOException, ParseException {
+        Logger.info("Sending POST request to " + url);
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpPost post = new HttpPost(url);
             for (Map.Entry<String, String> header : headers.entrySet()) {
@@ -83,6 +85,7 @@ public class HttpUtil {
      * @throws IOException if an I/O error occurs
      */
     public static boolean sha1verify(File path, String origin_sha1) throws NoSuchAlgorithmException, IOException {
+        Logger.info("Verifying SHA-1 of " + path.getName());
         MessageDigest sha1 = MessageDigest.getInstance("SHA-1");
         FileInputStream fis = new FileInputStream(path);
 
@@ -115,6 +118,7 @@ public class HttpUtil {
      * @throws URISyntaxException if the target URL is invalid
      */
     public static String sendGet(String url, Map<String, Object> data, Map<String, String> headers) throws IOException, ParseException, URISyntaxException {
+        Logger.info("Sending GET request to " + url);
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             URIBuilder uriBuilder = new URIBuilder(url);
             if (data != null) {

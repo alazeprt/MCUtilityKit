@@ -1,5 +1,6 @@
 package top.alazeprt.game;
 
+import org.tinylog.Logger;
 import top.alazeprt.account.Account;
 import top.alazeprt.account.MicrosoftAccount;
 import top.alazeprt.java.Java;
@@ -31,9 +32,11 @@ public class Vanilla {
      * @return the result of the operation
      */
     public static Result extractNatives(Instance instance) {
+        Logger.info("Extracting native libraries...");
         File root = instance.root();
         Gson gson = new Gson();
         Map<String, Object> json = null;
+        Logger.info("Getting instance information...");
         try {
             json = gson.fromJson(new InputStreamReader(
                     new FileInputStream(new File(root, "versions/" + instance.name() + "/" + instance.name() + ".json")), StandardCharsets.UTF_8), Map.class);
@@ -50,12 +53,14 @@ public class Vanilla {
         }
         List<Map<String, Object>> libraries = (List<Map<String, Object>>) json.get("libraries");
         String folderName = "";
+        Logger.info("Extracting libraries...");
         for(Map<String, Object> library : libraries) {
             String name = library.get("name").toString();
             String path = ((Map<String, Object>)((Map<String, Object>) library.get("downloads")).get("artifact")).get("path").toString();
             String fileName = path.substring(path.lastIndexOf('/') + 1);
             try {
                 if(name.contains("native")) {
+                    Logger.debug("Extracting " + fileName + "...");
                     if(System.getProperty("os.name").toLowerCase().contains("windows")) {
                         if(System.getProperty("os.arch").toLowerCase().contains("64")) {
                             folderName = "natives-windows-x86_64";
@@ -111,9 +116,11 @@ public class Vanilla {
                     }
                 }
             } catch (IOException e) {
-               return Result.FILE_IO_EXCEPTION.setData(e);
+                Logger.error("Failed to extract " + fileName + ": " + e.getMessage());
+                return Result.FILE_IO_EXCEPTION.setData(e);
             }
         }
+        Logger.info("Finished extracting native libraries.");
         return Result.SUCCESS.setData(new File(versionFolder, folderName).getAbsolutePath());
     }
 
@@ -127,8 +134,10 @@ public class Vanilla {
      * @return the result of the operation
      */
     public static Result launch(Java java, Instance instance, Account account, String nativesFolder) {
+        Logger.info("Launching game...");
         File root = instance.root();
         Gson gson = new Gson();
+        Logger.info("Getting instance information...");
         Map<String, Object> json = null;
         try {
             json = gson.fromJson(new InputStreamReader(
@@ -140,8 +149,10 @@ public class Vanilla {
         List<Map<String, Map<String, Map<String, Object>>>> libraries = (List<Map<String, Map<String, Map<String, Object>>>>)
                 json.get("libraries");
         StringBuilder librariesString = new StringBuilder();
+        Logger.info("Getting libraries...");
         for(Map<String, Map<String, Map<String, Object>>> library : libraries) {
             String fileName = library.get("downloads").get("artifact").get("path").toString();
+            Logger.debug("Adding library: " + fileName);
             if(fileName.contains("native")) {
                 if(System.getProperty("os.name").toLowerCase().contains("windows")) {
                     if(System.getProperty("os.arch").toLowerCase().contains("64")) {
@@ -181,7 +192,9 @@ public class Vanilla {
                 instance, account);
         List<Object> jvmArguments = (List<Object>) ((Map<String, Object>) json.get("arguments")).get("jvm");
         StringBuilder jvmArgumentsBuilder = new StringBuilder();
+        Logger.info("Getting JVM arguments...");
         for(Object jvmArgument : jvmArguments) {
+            Logger.debug("Adding JVM argument: " + jvmArgument);
             if(jvmArgument instanceof String) {
                 jvmArgumentsBuilder.append(handler.handle(jvmArgument.toString())).append(" ");
             } else {
@@ -213,15 +226,18 @@ public class Vanilla {
                 }
             }
         }
+        Logger.info("Getting game arguments...");
         List<Object> gameArguments = (List<Object>) ((Map<String, Object>) json.get("arguments")).get("game");
         StringBuilder gameArgumentsBuilder = new StringBuilder();
         for(Object gameArgument : gameArguments) {
+            Logger.debug("Adding game argument: " + gameArgument);
             if(gameArgument instanceof String) {
                 gameArgumentsBuilder.append(handler.handle(gameArgument.toString())).append(" ");
             }
         }
         gameArgumentsBuilder.deleteCharAt(gameArgumentsBuilder.length() - 1);
         gameArgumentsBuilder.append("--width 854 --height 480 ");
+        Logger.info("Starting game...");
         String command = "\"" + java.getPath().replace("\\", "\\\\") + "\" " + jvmArgumentsBuilder + json.get("mainClass").toString() + " " + gameArgumentsBuilder;
         Thread thread = new Thread(() -> {
             try {

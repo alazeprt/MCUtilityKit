@@ -17,6 +17,8 @@ dependencies {
     implementation("commons-io:commons-io:2.16.1")
     implementation("org.apache.commons:commons-compress:1.26.1")
     implementation("org.apache.httpcomponents.client5:httpclient5:5.3.1")
+    implementation("org.tinylog:tinylog-api:2.7.0")
+    implementation("org.tinylog:tinylog-impl:2.7.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.2")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.2")
 }

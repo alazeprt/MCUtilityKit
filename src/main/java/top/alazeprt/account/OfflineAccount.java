@@ -1,5 +1,7 @@
 package top.alazeprt.account;
 
+import org.tinylog.Logger;
+
 import java.util.UUID;
 
 /**
@@ -23,6 +25,7 @@ public class OfflineAccount implements Account {
     public OfflineAccount(String name) {
         this.name = name;
         this.uuid = UUID.randomUUID();
+        Logger.info("Added offline account: " + name + ", UUID: " + uuid);
     }
 
     /**
@@ -34,6 +37,7 @@ public class OfflineAccount implements Account {
     public OfflineAccount(String name, UUID uuid) {
         this.name = name;
         this.uuid = uuid;
+        Logger.info("Added offline account: " + name + ", UUID: " + uuid);
     }
 
 

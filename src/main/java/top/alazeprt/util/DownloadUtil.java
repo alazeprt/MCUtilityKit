@@ -1,5 +1,7 @@
 package top.alazeprt.util;
 
+import org.tinylog.Logger;
+
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,6 +28,7 @@ public class DownloadUtil {
      * @throws RuntimeException if an error occurs
      */
     public static void multi(String url, String path, int threadCount) throws InterruptedException, IOException, RuntimeException {
+        Logger.info("Downloading " + url + " using " + threadCount + " threads...");
         URL downloadUrl = new URL(url);
         HttpURLConnection connection = (HttpURLConnection) downloadUrl.openConnection();
         int fileSize = connection.getContentLength();
@@ -46,7 +49,7 @@ public class DownloadUtil {
             thread.join();
         }
 
-        System.out.println("Download completed successfully.");
+        Logger.info("Download completed successfully.");
     }
 
     private static class DownloadThread extends Thread {
@@ -84,7 +87,7 @@ public class DownloadUtil {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            System.out.println("Downloaded bytes " + startByte + " to " + endByte);
+            Logger.debug("Downloaded part " + startByte + " to " + endByte);
         }
     }
 
@@ -96,6 +99,7 @@ public class DownloadUtil {
      * @throws IOException if an I/O error occurs
      */
     public static void single(String url, String path) throws IOException {
+        Logger.info("Downloading " + url + " using a single thread...");
         URL downloadUrl = new URL(url);
         HttpURLConnection connection = (HttpURLConnection) downloadUrl.openConnection();
         connection.disconnect();
@@ -112,6 +116,6 @@ public class DownloadUtil {
         inputStream.close();
         outputStream.close();
 
-        System.out.println("Download completed successfully.");
+        Logger.info("Download completed successfully.");
     }
 }

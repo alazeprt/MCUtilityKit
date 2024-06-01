@@ -1,5 +1,6 @@
 package top.alazeprt.version;
 
+import org.tinylog.Logger;
 import top.alazeprt.util.HttpUtil;
 import top.alazeprt.util.Result;
 import com.google.gson.Gson;
@@ -62,14 +63,17 @@ public class Manifest {
      * @return the result of the operation
      */
     public Result reloadData() {
+        Logger.info("Reloading manifest from " + url);
         Gson gson = new Gson();
         String data = null;
         try {
             data = HttpUtil.sendGet(url, new HashMap<>(), new HashMap<>());
             this.manifest = gson.fromJson(data, Map.class);
         } catch (IOException | URISyntaxException | ParseException e) {
+            Logger.error("Failed to load manifest from " + url, e);
             return Result.NETWORK_IO_EXCEPTION;
         } catch (JsonSyntaxException e) {
+            Logger.error("Failed to parse manifest from " + url, e);
             return Result.JSON_SYNTAX_EXCEPTION.setData(data);
         }
         return Result.SUCCESS.setData(this);
@@ -90,10 +94,12 @@ public class Manifest {
      * @return the version list
      */
     public Result getVersionList() {
+        Logger.info("Getting version list...");
         List<Version> versionList = new ArrayList<>();
         try {
             List<Map<String, Object>> versions = (List<Map<String, Object>>) manifest.get("versions");
             for(Map<String, Object> version : versions) {
+                Logger.debug("Got version: " + version.get("id"));
                 String id = version.get("id").toString();
                 VersionType type = VersionType.valueOf(version.get("type").toString().toUpperCase());
                 String url = version.get("url").toString();
@@ -102,6 +108,7 @@ public class Manifest {
                 versionList.add(version1);
             }
         } catch (NullPointerException e) {
+            Logger.error("Failed to get version list", e);
             return Result.MANIFEST_ERROR.setData(manifest);
         }
         return Result.SUCCESS.setData(versionList);

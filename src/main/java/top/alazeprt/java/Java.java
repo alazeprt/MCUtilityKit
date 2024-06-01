@@ -1,5 +1,7 @@
 package top.alazeprt.java;
 
+import org.tinylog.Logger;
+
 /**
  * Represents a Java
  *
@@ -17,6 +19,7 @@ public class Java {
      * @param version version
      */
     public Java(String path, int version) {
+        Logger.info("Adding Java: " + path + " " + version);
         this.path = path;
         this.version = version;
     }
