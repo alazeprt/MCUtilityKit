@@ -75,7 +75,7 @@ public class Manifest {
             return new Result<>(ResultType.NETWORK_IO_EXCEPTION);
         } catch (JsonSyntaxException e) {
             Logger.error("Failed to parse manifest from " + url, e);
-            return new Result<>(ResultType.JSON_SYNTAX_EXCEPTION.setData(data));
+            return new Result<>(ResultType.JSON_SYNTAX_EXCEPTION, new Exception("Failed to parse manifest from " + url, e));
         }
         return new Result<>(ResultType.SUCCESS, this);
     }
@@ -110,7 +110,7 @@ public class Manifest {
             }
         } catch (NullPointerException e) {
             Logger.error("Failed to get version list", e);
-            return new Result<>(ResultType.MANIFEST_ERROR.setData(manifest));
+            return new Result<>(ResultType.MANIFEST_ERROR, new Exception("Failed to get version list", e));
         }
         return new Result<>(ResultType.SUCCESS, versionList);
     }

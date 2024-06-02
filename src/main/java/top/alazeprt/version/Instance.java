@@ -1,8 +1,10 @@
 package top.alazeprt.version;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.tinylog.Logger;
 import top.alazeprt.util.DownloadUtil;
 import top.alazeprt.util.HttpUtil;
+import top.alazeprt.util.Result;
 import top.alazeprt.util.ResultType;
 import com.google.gson.Gson;
 import org.apache.commons.io.FileUtils;
@@ -33,7 +35,7 @@ public record Instance(File root, Version version, String name) {
      * @param threadCount number of threads used to download client files
      * @return the result of the operation
      */
-    public Result create(int threadCount) {
+    public Result<ObjectUtils.Null> create(int threadCount) {
         Logger.info("Creating instance: " + name);
         Gson gson = new Gson();
         File versionFolder = new File(root, "versions/" + name);
@@ -45,14 +47,14 @@ public record Instance(File root, Version version, String name) {
                 FileUtils.delete(new File(versionFolder, name + ".json"));
             } catch (IOException e) {
                 Logger.error("Failed to delete \"" + versionFolder + "/" + name + ".json\"", e);
-                return ResultType.FILE_IO_EXCEPTION.setData(e);
+                return new Result<>(ResultType.FILE_IO_EXCEPTION, e);
             }
         }
         try {
             DownloadUtil.single(version.url(), versionFolder.getAbsolutePath() + "/client.json");
         } catch (IOException e) {
             Logger.error("Failed to download \"" + versionFolder + "/client.json\"", e);
-            return ResultType.NETWORK_IO_EXCEPTION.setData(e);
+            return new Result<>(ResultType.NETWORK_IO_EXCEPTION, e);
         }
         Logger.info("Downloading client.json ...");
         String clientUrl;
@@ -70,25 +72,25 @@ public record Instance(File root, Version version, String name) {
                 try {
                     if(HttpUtil.sha1verify(new File(versionFolder, name + ".jar"), clientSha1)) {
                         FileUtils.moveFile(new File(versionFolder, "client.json"), new File(versionFolder, name + ".json"));
-                        return ResultType.SUCCESS;
+                        return new Result<>(ResultType.SUCCESS);
                     } else {
                         FileUtils.delete(new File(versionFolder, name + ".jar"));
                     }
                 } catch (NoSuchAlgorithmException e) {
                     Logger.error("Failed to verify \"" + versionFolder + "/" + name + ".jar\"", e);
-                    return ResultType.ALGORITHM_EXCEPTION.setData(e);
+                    return new Result<>(ResultType.ALGORITHM_EXCEPTION, e);
                 }
             }
         } catch (IOException e) {
             Logger.error("Failed to read \"" + versionFolder + "/client.json\"", e);
-            return ResultType.FILE_IO_EXCEPTION.setData(e);
+            return new Result<>(ResultType.FILE_IO_EXCEPTION, e);
         }
         Logger.info("Downloading client.jar ...");
         try {
             DownloadUtil.multi(clientUrl, versionFolder.getAbsolutePath() + "/client.jar", threadCount);
         } catch (InterruptedException | IOException e) {
             Logger.error("Failed to download \"" + versionFolder + "/client.jar\"", e);
-            return ResultType.NETWORK_IO_EXCEPTION.setData(e);
+            return new Result<>(ResultType.NETWORK_IO_EXCEPTION, e);
         }
         try {
             if(!HttpUtil.sha1verify(new File(versionFolder, "client.jar"), clientSha1)) {
@@ -96,20 +98,20 @@ public record Instance(File root, Version version, String name) {
                     DownloadUtil.multi(clientUrl, versionFolder.getAbsolutePath() + "/client.jar", 1);
                 } catch (IOException | InterruptedException e) {
                     Logger.error("Failed to download \"" + versionFolder + "/client.jar\"", e);
-                    return ResultType.NETWORK_IO_EXCEPTION.setData(e);
+                    return new Result<>(ResultType.NETWORK_IO_EXCEPTION, e);
                 }
                 if(!HttpUtil.sha1verify(new File(versionFolder, "client.jar"), clientSha1)) {
                     Logger.warn("The SHA-1 of the \"client.jar\" does not match the SHA-1 of the original file!");
-                    return ResultType.SHA1_NOT_MATCH
-                            .setData(new RuntimeException("The SHA-1 of the \"client.jar\" does not match the SHA-1 of the original file!"));
+                    return new Result<>(ResultType.SHA1_NOT_MATCH, 
+                            new RuntimeException("The SHA-1 of the \"client.jar\" does not match the SHA-1 of the original file!"));
                 }
             }
         } catch (NoSuchAlgorithmException e) {
             Logger.error("Failed to verify \"" + versionFolder + "/client.jar\"", e);
-            return ResultType.ALGORITHM_EXCEPTION.setData(e);
+            return new Result<>(ResultType.ALGORITHM_EXCEPTION, e);
         } catch (IOException e) {
             Logger.error("Failed to read \"" + versionFolder + "/client.jar\"", e);
-            return ResultType.FILE_IO_EXCEPTION.setData(e);
+            return new Result<>(ResultType.FILE_IO_EXCEPTION, e);
         }
         Logger.info("Renaming client files...");
         try {
@@ -117,10 +119,10 @@ public record Instance(File root, Version version, String name) {
             FileUtils.moveFile(new File(versionFolder, "client.json"), new File(versionFolder, name + ".json"));
         } catch (IOException e) {
             Logger.error("Failed to rename \"" + versionFolder + "/client.jar\"", e);
-            return ResultType.FILE_IO_EXCEPTION.setData(e);
+            return new Result<>(ResultType.FILE_IO_EXCEPTION, e);
         }
         Logger.info("Successfully created instance: " + name);
-        return ResultType.SUCCESS;
+        return new Result<>(ResultType.SUCCESS);
     }
 
     /**
@@ -141,7 +143,7 @@ public record Instance(File root, Version version, String name) {
             try {
                 DownloadUtil.multi(version().url(), versionFolder.getAbsolutePath() + "/" + name + ".json", downloadThreadCount);
             } catch (InterruptedException | IOException e) {
-                return ResultType.NETWORK_IO_EXCEPTION.setData(e);
+                return new Result<>(ResultType.NETWORK_IO_EXCEPTION, e);
             }
         }
         Logger.info("Downloading asset index...");
@@ -152,7 +154,7 @@ public record Instance(File root, Version version, String name) {
             json = gson.fromJson(new InputStreamReader(new FileInputStream(new File(versionFolder, name + ".json"))), Map.class);
         } catch (FileNotFoundException e) {
             Logger.error("Failed to read \"" + versionFolder + "/" + name + ".json\"", e);
-            return ResultType.FILE_IO_EXCEPTION.setData(e);
+            return new Result<>(ResultType.FILE_IO_EXCEPTION, e);
         }
         Map<String, Object> assetIndexInfo = (Map<String, Object>) json.get("assetIndex");
         String assetIndexUrl = assetIndexInfo.get("url").toString();
@@ -162,14 +164,14 @@ public record Instance(File root, Version version, String name) {
             DownloadUtil.multi(assetIndexUrl, assetIndexFolder.getAbsolutePath() + "/" + assetIndexName, 8);
         } catch (InterruptedException | IOException e) {
             Logger.error("Failed to download \"" + assetIndexFolder + "/" + assetIndexName + "\"", e);
-            return ResultType.NETWORK_IO_EXCEPTION.setData(e);
+            return new Result<>(ResultType.NETWORK_IO_EXCEPTION, e);
         }
         try {
             if(!HttpUtil.sha1verify(new File(assetIndexFolder, assetIndexName), assetIndexsha1)) {
                 try {
                     DownloadUtil.single(assetIndexUrl, assetIndexFolder.getAbsolutePath() + "/" + assetIndexName);
                 } catch (IOException e) {
-                    return ResultType.FILE_IO_EXCEPTION.setData(e);
+                    return new Result<>(ResultType.FILE_IO_EXCEPTION, e);
                 }
                 if(!HttpUtil.sha1verify(new File(assetIndexFolder, assetIndexName), assetIndexsha1)) {
                     Logger.warn("The SHA-1 of the assetIndex does not match the SHA-1 of the original file!");
@@ -178,7 +180,7 @@ public record Instance(File root, Version version, String name) {
             }
         } catch (NoSuchAlgorithmException | IOException e) {
             Logger.error("Failed to verify \"" + assetIndexFolder + "/" + assetIndexName + "\"", e);
-            return ResultType.ALGORITHM_EXCEPTION.setData(e);
+            return new Result<>(ResultType.ALGORITHM_EXCEPTION, e);
         }
         Logger.info("Downloading assets...");
         File assetsFolder = new File(root, "assets/objects");
@@ -189,7 +191,7 @@ public record Instance(File root, Version version, String name) {
                     new InputStreamReader(new FileInputStream(new File(assetIndexFolder, assetIndexName))), Map.class);
         } catch (FileNotFoundException e) {
             Logger.error("Failed to read \"" + assetIndexFolder + "/" + assetIndexName + "\"", e);
-            return ResultType.FILE_IO_EXCEPTION.setData(e);
+            return new Result<>(ResultType.FILE_IO_EXCEPTION, e);
         }
         try {
             downloadAssets(assetsThreadCount, assetIndex, assetsFolder);
@@ -197,9 +199,9 @@ public record Instance(File root, Version version, String name) {
             downloadAssets(4, assetIndex, assetsFolder);
         } catch (InterruptedException e) {
             Logger.error("Failed to download assets", e);
-            return ResultType.NETWORK_IO_EXCEPTION.setData(e);
+            return new Result<>(ResultType.NETWORK_IO_EXCEPTION, e);
         }
-        return ResultType.SUCCESS;
+        return new Result<>(ResultType.SUCCESS);
     }
 
     private void downloadAssets(int assetsThreadCount, Map<String, Map<String, Map<String, Object>>> assetIndex, File assetsFolder)
@@ -258,7 +260,7 @@ public record Instance(File root, Version version, String name) {
                     gson.fromJson(new InputStreamReader(new FileInputStream(new File(versionFolder, name + ".json"))), Map.class).get("libraries");
         } catch (FileNotFoundException e) {
             Logger.error("Failed to read \"" + versionFolder + "/" + name + ".json\"", e);
-            return ResultType.FILE_IO_EXCEPTION.setData(e);
+            return new Result<>(ResultType.FILE_IO_EXCEPTION, e);
         }
         ExecutorService executor = Executors.newFixedThreadPool(librariesThreadCount);
         for(Map<String, Map<String, Map<String, Object>>> library : libraries) {
@@ -279,7 +281,7 @@ public record Instance(File root, Version version, String name) {
                         continue;
                     }
                 } catch (NoSuchAlgorithmException | IOException e) {
-                    return ResultType.ALGORITHM_EXCEPTION.setData(e);
+                    return new Result<>(ResultType.ALGORITHM_EXCEPTION, e);
                 }
             }
             try {
@@ -300,7 +302,7 @@ public record Instance(File root, Version version, String name) {
                 });
             } catch (RuntimeException e) {
                 Logger.error("Failed to download \"" + librariesFolder + "/" + path + "\"", e);
-                return ResultType.INDETERMINATE.setData(e);
+                return new Result<>(ResultType.INDETERMINATE, e);
             }
         }
         executor.shutdown();
@@ -308,9 +310,9 @@ public record Instance(File root, Version version, String name) {
             executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
         } catch (InterruptedException e) {
             Logger.error("Failed to download libraries", e);
-            return ResultType.NETWORK_IO_EXCEPTION.setData(e);
+            return new Result<>(ResultType.NETWORK_IO_EXCEPTION, e);
         }
         Logger.info("Libraries downloaded");
-        return ResultType.SUCCESS;
+        return new Result<>(ResultType.SUCCESS);
     }
 }

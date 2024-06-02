@@ -43,7 +43,7 @@ public class Vanilla {
             json = gson.fromJson(new InputStreamReader(
                     new FileInputStream(new File(root, "versions/" + instance.name() + "/" + instance.name() + ".json")), StandardCharsets.UTF_8), Map.class);
         } catch (FileNotFoundException e) {
-            return new Result<>(ResultType.FILE_IO_EXCEPTION.setData(e));
+            return new Result<>(ResultType.FILE_IO_EXCEPTION, e);
         }
         File librariesFolder = new File(root, "libraries");
         if(!librariesFolder.exists()) {
@@ -119,11 +119,11 @@ public class Vanilla {
                 }
             } catch (IOException e) {
                 Logger.error("Failed to extract " + fileName + ": " + e.getMessage());
-                return new Result<>(ResultType.FILE_IO_EXCEPTION.setData(e));
+                return new Result<>(ResultType.FILE_IO_EXCEPTION, e);
             }
         }
         Logger.info("Finished extracting native libraries.");
-        return new Result<>(ResultType.SUCCESS.setData(new File(versionFolder, folderName).getAbsolutePath()));
+        return new Result<>(ResultType.SUCCESS, new File(versionFolder, folderName));
     }
 
     /**
@@ -135,7 +135,7 @@ public class Vanilla {
      * @param nativesFolder the natives folder
      * @return the result of the operation
      */
-    public static Result<ObjectUtils.Null> launch(Java java, Instance instance, Account account, String nativesFolder) {
+    public static Result<ObjectUtils.Null> launch(Java java, Instance instance, Account account, File nativesFolder) {
         Logger.info("Launching game...");
         File root = instance.root();
         Gson gson = new Gson();
@@ -145,7 +145,7 @@ public class Vanilla {
             json = gson.fromJson(new InputStreamReader(
                     new FileInputStream(new File(root, "versions/" + instance.name() + "/" + instance.name() + ".json")), StandardCharsets.UTF_8), Map.class);
         } catch (FileNotFoundException e) {
-            return new Result<>(ResultType.FILE_IO_EXCEPTION.setData(e));
+            return new Result<>(ResultType.FILE_IO_EXCEPTION, e);
         }
         File libraryFolder = new File(root, "libraries");
         List<Map<String, Map<String, Map<String, Object>>>> libraries = (List<Map<String, Map<String, Map<String, Object>>>>)
@@ -190,7 +190,7 @@ public class Vanilla {
                     library.get("downloads").get("artifact").get("path").toString().replace("/", "\\")).append(";");
         }
         librariesString.append(new File(root, "versions" + File.separator + instance.name() + File.separator + instance.name() + ".jar").getAbsolutePath());
-        ArgumentHandler handler = new ArgumentHandler(root.getAbsolutePath(), nativesFolder, json.get("assets").toString(), librariesString.toString(),
+        ArgumentHandler handler = new ArgumentHandler(root.getAbsolutePath(), nativesFolder.getAbsolutePath(), json.get("assets").toString(), librariesString.toString(),
                 instance, account);
         List<Object> jvmArguments = (List<Object>) ((Map<String, Object>) json.get("arguments")).get("jvm");
         StringBuilder jvmArgumentsBuilder = new StringBuilder();
@@ -253,7 +253,7 @@ public class Vanilla {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    System.out.println(line);
+                    Logger.info("[From Minecraft] " + line);
                 }
             } catch (Exception e) {
                 throw new RuntimeException(e);

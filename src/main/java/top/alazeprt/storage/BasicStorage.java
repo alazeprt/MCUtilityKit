@@ -61,7 +61,7 @@ public class BasicStorage {
                 FileUtils.delete(file);
             } catch (IOException e) {
                 Logger.error("Failed to delete data file", e);
-                return new Result<>(ResultType.FILE_IO_EXCEPTION.setData(e));
+                return new Result<>(ResultType.FILE_IO_EXCEPTION, e);
             }
         }
         try {
@@ -72,7 +72,7 @@ public class BasicStorage {
             Runtime.getRuntime().exec("attrib +H \"" + file.getAbsolutePath() + "\"");
         } catch (IOException e) {
             Logger.error("Failed to create data file", e);
-            return new Result<>(ResultType.FILE_IO_EXCEPTION.setData(e));
+            return new Result<>(ResultType.FILE_IO_EXCEPTION, e);
         }
         return new Result<>(ResultType.SUCCESS);
     }
@@ -95,10 +95,10 @@ public class BasicStorage {
             json = gson.fromJson(new InputStreamReader(new FileInputStream(file)), Map.class);
         } catch (IOException e) {
             Logger.error("Failed to read data file", e);
-            return new Result<>(ResultType.FILE_IO_EXCEPTION.setData(e));
+            return new Result<>(ResultType.FILE_IO_EXCEPTION, e);
         } catch (JsonSyntaxException e) {
             Logger.error("Failed to parse data file", e);
-            return new Result<>(ResultType.JSON_SYNTAX_EXCEPTION.setData(e));
+            return new Result<>(ResultType.JSON_SYNTAX_EXCEPTION, e);
         }
         List<Map<String, Object>> accounts = (List<Map<String, Object>>) json.getOrDefault("accounts", new ArrayList<>());
         if(account instanceof MicrosoftAccount microsoftAccount) {
@@ -112,7 +112,7 @@ public class BasicStorage {
             FileUtils.writeStringToFile(file, gson.toJson(json), StandardCharsets.UTF_8);
         } catch (IOException e) {
             Logger.error("Failed to write data file", e);
-            return new Result<>(ResultType.FILE_IO_EXCEPTION.setData(e));
+            return new Result<>(ResultType.FILE_IO_EXCEPTION, e);
         }
         return new Result<>(ResultType.SUCCESS);
     }
@@ -135,10 +135,10 @@ public class BasicStorage {
             json = gson.fromJson(new InputStreamReader(new FileInputStream(file)), Map.class);
         } catch (IOException e) {
             Logger.error("Failed to read data file", e);
-            return new Result<>(ResultType.FILE_IO_EXCEPTION.setData(e));
+            return new Result<>(ResultType.FILE_IO_EXCEPTION, e);
         } catch (JsonSyntaxException e) {
             Logger.error("Failed to parse data file", e);
-            return new Result<>(ResultType.JSON_SYNTAX_EXCEPTION.setData(e));
+            return new Result<>(ResultType.JSON_SYNTAX_EXCEPTION, e);
         }
         List<Map<String, Object>> accounts = (List<Map<String, Object>>) json.getOrDefault("accounts", new ArrayList<>());
         for(Map<String, Object> account : accounts) {
@@ -176,10 +176,10 @@ public class BasicStorage {
             json = gson.fromJson(new InputStreamReader(new FileInputStream(file)), Map.class);
         } catch (IOException e) {
             Logger.error("Failed to read data file", e);
-            return new Result<>(ResultType.FILE_IO_EXCEPTION.setData(e));
+            return new Result<>(ResultType.FILE_IO_EXCEPTION, e);
         } catch (JsonSyntaxException e) {
             Logger.error("Failed to parse data file", e);
-            return new Result<>(ResultType.JSON_SYNTAX_EXCEPTION.setData(e));
+            return new Result<>(ResultType.JSON_SYNTAX_EXCEPTION, e);
         }
         List<Map<String, Object>> accounts = (List<Map<String, Object>>) json.getOrDefault("accounts", new ArrayList<>());
         for(Map<String, Object> account : accounts) {
@@ -195,7 +195,7 @@ public class BasicStorage {
             FileUtils.writeStringToFile(file, gson.toJson(json), StandardCharsets.UTF_8);
         } catch (IOException e) {
             Logger.error("Failed to write data file", e);
-            return new Result<>(ResultType.FILE_IO_EXCEPTION.setData(e));
+            return new Result<>(ResultType.FILE_IO_EXCEPTION, e);
         }
         return new Result<>(ResultType.SUCCESS);
     }
@@ -218,10 +218,10 @@ public class BasicStorage {
             json = gson.fromJson(new InputStreamReader(new FileInputStream(file)), Map.class);
         } catch (IOException e) {
             Logger.error("Failed to read data file", e);
-            return new Result<>(ResultType.FILE_IO_EXCEPTION.setData(e));
+            return new Result<>(ResultType.FILE_IO_EXCEPTION, e);
         } catch (JsonSyntaxException e) {
             Logger.error("Failed to parse data file", e);
-            return new Result<>(ResultType.JSON_SYNTAX_EXCEPTION.setData(e));
+            return new Result<>(ResultType.JSON_SYNTAX_EXCEPTION, e);
         }
         List<Map<String, Object>> instances = (List<Map<String, Object>>) json.getOrDefault("instances", new ArrayList<>());
         instances.add(Map.of("name", instance.name(), "version", instance.version().version(), "root", instance.root().getAbsolutePath()));
@@ -230,7 +230,7 @@ public class BasicStorage {
             FileUtils.writeStringToFile(file, gson.toJson(json), StandardCharsets.UTF_8);
         } catch (IOException e) {
             Logger.error("Failed to write data file", e);
-            return new Result<>(ResultType.FILE_IO_EXCEPTION.setData(e));
+            return new Result<>(ResultType.FILE_IO_EXCEPTION, e);
         }
         return new Result<>(ResultType.SUCCESS);
     }
@@ -253,18 +253,18 @@ public class BasicStorage {
             json = gson.fromJson(new InputStreamReader(new FileInputStream(file)), Map.class);
         } catch (IOException e) {
             Logger.error("Failed to read data file", e);
-            return new Result<>(ResultType.FILE_IO_EXCEPTION.setData(e));
+            return new Result<>(ResultType.FILE_IO_EXCEPTION, e);
         } catch (JsonSyntaxException e) {
             Logger.error("Failed to parse data file", e);
-            return new Result<>(ResultType.JSON_SYNTAX_EXCEPTION.setData(e));
+            return new Result<>(ResultType.JSON_SYNTAX_EXCEPTION, e);
         }
         List<Map<String, Object>> instances = (List<Map<String, Object>>) json.getOrDefault("instances", new ArrayList<>());
         List<Instance> instanceList = new ArrayList<>();
         Map<String, Version> versionMap = new HashMap<>();
         Result<List<Version>> result = manifest.getVersionList();
         if(!result.getType().equals(ResultType.SUCCESS)) {
-            Logger.warn("Failed to get version list", result.getType().toJSON());
-            return new Result<>(result.getType());
+            Logger.warn("Failed to get version list", result.getException());
+            return new Result<>(result.getType(), result.getException());
         }
         List<Version> versionList = (List<Version>) result.getData();
         for(Version version : versionList) {
@@ -273,7 +273,7 @@ public class BasicStorage {
         for(Map<String, Object> instance : instances) {
             if(!versionMap.containsKey(instance.get("version").toString())) {
                 Logger.warn("Failed to get version {}", instance.get("version").toString());
-                return new Result<>(ResultType.INSTANCE_NOT_FOUND.setData(instance.get("version").toString()));
+                return new Result<>(ResultType.INSTANCE_NOT_FOUND, new Exception("Failed to get version " + instance.get("version").toString()));
             }
             Logger.debug("Found instance {} with version {} and root {}", instance.get("name"), instance.get("version"), instance.get("root"));
             instanceList.add(new Instance(new File(instance.get("root").toString()), versionMap.get(instance.get("version")), instance.get("name").toString()));
@@ -300,10 +300,10 @@ public class BasicStorage {
             json = gson.fromJson(new InputStreamReader(new FileInputStream(file)), Map.class);
         } catch (IOException e) {
             Logger.error("Failed to read data file", e);
-            return new Result<>(ResultType.FILE_IO_EXCEPTION.setData(e));
+            return new Result<>(ResultType.FILE_IO_EXCEPTION, e);
         } catch (JsonSyntaxException e) {
             Logger.error("Failed to parse data file", e);
-            return new Result<>(ResultType.JSON_SYNTAX_EXCEPTION.setData(e));
+            return new Result<>(ResultType.JSON_SYNTAX_EXCEPTION, e);
         }
         List<Map<String, Object>> instances = (List<Map<String, Object>>) json.getOrDefault("instances", new ArrayList<>());
         for (Map<String, Object> instance : instances) {
@@ -319,7 +319,7 @@ public class BasicStorage {
             FileUtils.writeStringToFile(file, gson.toJson(json), StandardCharsets.UTF_8);
         } catch (IOException e) {
             Logger.error("Failed to write data file", e);
-            return new Result<>(ResultType.FILE_IO_EXCEPTION.setData(e));
+            return new Result<>(ResultType.FILE_IO_EXCEPTION, e);
         }
         return new Result<>(ResultType.SUCCESS);
     }

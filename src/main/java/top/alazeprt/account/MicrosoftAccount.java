@@ -126,7 +126,7 @@ public class MicrosoftAccount implements Account {
             Map<String, Object> microsoftMap = (Map<String, Object>) gson.fromJson(microsoftData, Map.class);
             if(Objects.equals(microsoftMap.get("access_token"), null)) {
                 Logger.error("Unable to get Microsoft account information" + microsoftData);
-                return new Result<>(ResultType.MICROSOFT_TOKEN_NOT_FOUND.setData(microsoftMap));
+                return new Result<>(ResultType.MICROSOFT_TOKEN_NOT_FOUND, new Exception("Unable to get Microsoft account information" + microsoftData));
             }
             Logger.info("XBox Live authentication in progress...");
             Map<String, Object> xBoxSend = Map.of(
@@ -141,7 +141,7 @@ public class MicrosoftAccount implements Account {
             Map<String, Object> xBoxMap = (Map<String, Object>) gson.fromJson(xBoxData, Map.class);
             if(!xBoxMap.containsKey("Token") || !xBoxMap.containsKey("DisplayClaims")) {
                 Logger.error("Unable to get XBox account information" + xBoxData);
-                return new Result<>(ResultType.XBOX_LIVE_TOKEN_NOT_FOUND.setData(xBoxMap));
+                return new Result<>(ResultType.XBOX_LIVE_TOKEN_NOT_FOUND, new Exception("Unable to get XBox account information" + xBoxData));
             }
             String uhs = ((Map<?, ?>)((List<?>)((Map<?, ?>) xBoxMap.get("DisplayClaims")).get("xui")).get(0)).get("uhs").toString();
             Logger.info("XSTS authentication in progress...");
@@ -178,7 +178,7 @@ public class MicrosoftAccount implements Account {
             Map<String, Object> profileMap = (Map<String, Object>) gson.fromJson(profileData, Map.class);
             if(!profileMap.containsKey("id")) {
                 Logger.error("Invalid Minecraft profile" + profileData);
-                return new Result<>(ResultType.INVALID_PROFILE.setData(profileMap));
+                return new Result<>(ResultType.INVALID_PROFILE, new Exception("Invalid Minecraft profile" + profileData));
             }
             UUID uuid = UUIDUtil.formatUuid(profileMap.get("id").toString());
             String name = profileMap.get("name").toString();
@@ -187,10 +187,10 @@ public class MicrosoftAccount implements Account {
             return new Result<>(ResultType.SUCCESS, new MicrosoftAccount(name, uuid, access_token));
         } catch (IOException | ParseException | URISyntaxException e) {
             Logger.error("Failed to get Minecraft account information", e);
-            return new Result<>(ResultType.NETWORK_IO_EXCEPTION.setData(e));
+            return new Result<>(ResultType.NETWORK_IO_EXCEPTION, e);
         } catch (JsonSyntaxException e) {
             Logger.error("Failed to get Minecraft account information", e);
-            return new Result<>(ResultType.JSON_SYNTAX_EXCEPTION.setData(e));
+            return new Result<>(ResultType.JSON_SYNTAX_EXCEPTION, e);
         }
     }
 }

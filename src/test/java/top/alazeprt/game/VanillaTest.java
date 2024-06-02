@@ -15,19 +15,19 @@ import static top.alazeprt.version.InstanceTest.instance;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class VanillaTest {
 
-    private static String nativesFolder;
+    private static File nativesFolder;
 
     @Test
     @Order(1)
     public void extractNativesTest() {
-        nativesFolder = (String) Vanilla.extractNatives(instance).getData();
+        nativesFolder = Vanilla.extractNatives(instance).getData();
     }
 
     @Test
     @Order(2)
     public void launchTest() {
         Vanilla.launch(new Java("C:\\Program Files\\Zulu\\zulu-21\\bin\\java.exe", 21),
-                instance, (Account) basicStorage.getAccount("test").getData(), nativesFolder);
+                instance, basicStorage.getAccount("test").getData(), nativesFolder);
     }
 
 }
