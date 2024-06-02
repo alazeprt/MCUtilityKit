@@ -5,10 +5,10 @@ import com.google.gson.Gson;
 import java.util.Map;
 
 /**
- * Represents the result of an operation
+ * Represents the result type of an operation
  *
  * @author alazeprt
- * @version 1.1
+ * @version 1.2
  */
 public enum ResultType {
     /**
@@ -95,7 +95,7 @@ public enum ResultType {
     }
 
     /**
-     * Get the result code
+     * Get the result type code
      *
      * @return the result code
      */

@@ -294,7 +294,7 @@ public class Vanilla {
             this.account = account;
             this.instance = instance;
             this.launcherName = "MCUtilityKit";
-            this.launcherVersion = "1.1";
+            this.launcherVersion = "1.2";
             this.versionType = launcherName + " " + launcherVersion;
         }
 

@@ -25,7 +25,7 @@ You need to choose the right code to add to your project based on your build sys
 <dependency>
 <groupId>top.alazeprt</groupId>
 <artifactId>MCUtilityKit</artifactId>
-<version>1.1</version>
+<version>1.2</version>
 </dependency
 </dependencies
 ```
@@ -33,14 +33,14 @@ You need to choose the right code to add to your project based on your build sys
 #### Gradle (Groovy DSL, build.gradle). 
 ```groovy
 dependencies {
-    implementation 'top.alazeprt:MCUtilityKit:1.1'
+    implementation 'top.alazeprt:MCUtilityKit:1.2'
 }
 ```
 
 #### Gradle (Kotlin DSL, build.gradle.kts).
 ```kotlin
 dependencies {
-    implementation("top.alazeprt:MCUtilityKit:1.1")
+    implementation("top.alazeprt:MCUtilityKit:1.2")
 }
 ```
 

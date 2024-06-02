@@ -25,7 +25,7 @@ MCUtilityKit是专为Minecraft启动器开发者和其他Minecraft相关应用�
     <dependency>
         <groupId>top.alazeprt</groupId>
         <artifactId>MCUtilityKit</artifactId>
-        <version>1.1</version>
+        <version>1.2</version>
     </dependency>
 </dependencies>
 ```
@@ -33,14 +33,14 @@ MCUtilityKit是专为Minecraft启动器开发者和其他Minecraft相关应用�
 #### Gradle (Groovy DSL, build.gradle): 
 ```groovy
 dependencies {
-    implementation 'top.alazeprt:MCUtilityKit:1.1'
+    implementation 'top.alazeprt:MCUtilityKit:1.2'
 }
 ```
 
 #### Gradle (Kotlin DSL, build.gradle.kts):
 ```kotlin
 dependencies {
-    implementation("top.alazeprt:MCUtilityKit:1.1")
+    implementation("top.alazeprt:MCUtilityKit:1.2")
 }
 ```
 
