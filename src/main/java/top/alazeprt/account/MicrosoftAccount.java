@@ -1,8 +1,10 @@
 package top.alazeprt.account;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.tinylog.Logger;
 import top.alazeprt.util.HttpUtil;
 import top.alazeprt.util.Result;
+import top.alazeprt.util.ResultType;
 import top.alazeprt.util.UUIDUtil;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -72,20 +74,20 @@ public class MicrosoftAccount implements Account {
      *
      * @return the result of the operation
      */
-    public static Result openLogin() {
+    public static Result<ObjectUtils.Null> openLogin() {
         Logger.info("Opening Microsoft login page...");
         try {
             Desktop desktop = Desktop.getDesktop();
             desktop.browse(URI.create("https://login.live.com/oauth20_authorize.srf?client_id=00000000402b5328&response_type=code&scope=service%3A%3Auser.auth.xboxlive.com%3A%3AMBI_SSL&redirect_uri=https%3A%2F%2Flogin.live.com%2Foauth20_desktop.srf"));
         } catch (IOException e) {
             Logger.error("Failed to open Microsoft login page", e);
-            return Result.NETWORK_IO_EXCEPTION.setData(e);
+            return new Result<>(ResultType.NETWORK_IO_EXCEPTION, e);
         } catch (UnsupportedOperationException e) {
             Logger.error("Failed to open Microsoft login page", e);
-            return Result.UNSUPPORTED_EXCEPTION.setData(e);
+            return new Result<>(ResultType.UNSUPPORTED_EXCEPTION, e);
         }
         Logger.info("Microsoft login page opened");
-        return Result.SUCCESS;
+        return new Result<>(ResultType.SUCCESS);
     }
 
     /**
@@ -94,7 +96,7 @@ public class MicrosoftAccount implements Account {
      * @param url the url that get at the end of the login
      * @return the result of the operation
      */
-    public static Result verifyLogin(String url) {
+    public static Result<MicrosoftAccount> verifyLogin(String url) {
         Logger.info("Getting Minecraft account information...");
         Gson gson = new Gson();
         Logger.info("Getting Microsoft account information...");
@@ -108,7 +110,8 @@ public class MicrosoftAccount implements Account {
         }
         if(!map.containsKey("code")) {
             Logger.error("Unable to get Microsoft account information via given url" + url);
-            return Result.URL_PARAMETER_NOT_FOUND.setData(url);
+            return new Result<>(ResultType.URL_PARAMETER_NOT_FOUND,
+                    new Exception("Unable to get Microsoft account information via given url" + url));
         }
         Map<String, Object> microsoftSend = Map.of(
                 "client_id", "00000000402b5328", 
@@ -123,7 +126,7 @@ public class MicrosoftAccount implements Account {
             Map<String, Object> microsoftMap = (Map<String, Object>) gson.fromJson(microsoftData, Map.class);
             if(Objects.equals(microsoftMap.get("access_token"), null)) {
                 Logger.error("Unable to get Microsoft account information" + microsoftData);
-                return Result.MICROSOFT_TOKEN_NOT_FOUND.setData(microsoftMap);
+                return new Result<>(ResultType.MICROSOFT_TOKEN_NOT_FOUND.setData(microsoftMap));
             }
             Logger.info("XBox Live authentication in progress...");
             Map<String, Object> xBoxSend = Map.of(
@@ -138,7 +141,7 @@ public class MicrosoftAccount implements Account {
             Map<String, Object> xBoxMap = (Map<String, Object>) gson.fromJson(xBoxData, Map.class);
             if(!xBoxMap.containsKey("Token") || !xBoxMap.containsKey("DisplayClaims")) {
                 Logger.error("Unable to get XBox account information" + xBoxData);
-                return Result.XBOX_LIVE_TOKEN_NOT_FOUND.setData(xBoxMap);
+                return new Result<>(ResultType.XBOX_LIVE_TOKEN_NOT_FOUND.setData(xBoxMap));
             }
             String uhs = ((Map<?, ?>)((List<?>)((Map<?, ?>) xBoxMap.get("DisplayClaims")).get("xui")).get(0)).get("uhs").toString();
             Logger.info("XSTS authentication in progress...");
@@ -153,15 +156,15 @@ public class MicrosoftAccount implements Account {
             ), false);
             Map<String, Object> xstsMap = (Map<String, Object>) gson.fromJson(xstsData, Map.class);
             if(!xstsMap.containsKey("Token")) {
-                Logger.error("Unable to get XSTS token" + xstsData);
-                return Result.XSTS_TOKEN_NOT_FOUND.setData(xstsMap);
+                Logger.error("Unable to get XSTS token from " + xstsData);
+                return new Result<>(ResultType.XSTS_TOKEN_NOT_FOUND, new Exception("Unable to get XSTS token from " + xstsData));
             }
             Logger.info("Minecraft authentication in progress...");
             String minecraftData = HttpUtil.sendPost("https://api.minecraftservices.com/launcher/login", Map.of("xtoken", "XBL3.0 x=" + uhs + ";" + xstsMap.get("Token").toString()), Map.of("Content-Type", "application/json"), false);
             Map<String, Object> minecraftMap = (Map<String, Object>) gson.fromJson(minecraftData, Map.class);
             if(!minecraftMap.containsKey("access_token")) {
-                Logger.error("Unable to get Minecraft access token" + minecraftData);
-                return Result.MICROSOFT_ACCESS_TOKEN_NOT_FOUND.setData(minecraftMap);
+                Logger.error("Unable to get Minecraft access token from " + minecraftData);
+                return new Result<>(ResultType.MICROSOFT_ACCESS_TOKEN_NOT_FOUND, new Exception("Unable to get Minecraft access token from " + minecraftData));
             }
             String access_token = minecraftMap.get("access_token").toString();
             Logger.info("Obtaining Minecraft profile...");
@@ -169,25 +172,25 @@ public class MicrosoftAccount implements Account {
             Map<String, Object> checkMap = (Map<String, Object>) gson.fromJson(checkData, Map.class);
             if(!checkMap.containsKey("items")) {
                 Logger.error("No Minecraft purchases on this account", checkData);
-                return Result.NOT_OWN_MINECRAFT.setData(checkMap);
+                return new Result<>(ResultType.NOT_OWN_MINECRAFT, new Exception(""));
             }
             String profileData = HttpUtil.sendGet("https://api.minecraftservices.com/minecraft/profile", new HashMap<>(), Map.of("Authorization", "Bearer " + access_token));
             Map<String, Object> profileMap = (Map<String, Object>) gson.fromJson(profileData, Map.class);
             if(!profileMap.containsKey("id")) {
                 Logger.error("Invalid Minecraft profile" + profileData);
-                return Result.INVALID_PROFILE.setData(profileMap);
+                return new Result<>(ResultType.INVALID_PROFILE.setData(profileMap));
             }
             UUID uuid = UUIDUtil.formatUuid(profileMap.get("id").toString());
             String name = profileMap.get("name").toString();
             Logger.info("Minecraft Account Information: Name: " + name + " UUID: " + uuid);
             Logger.debug(name + "'s Access token: " + access_token);
-            return Result.SUCCESS.setData(new MicrosoftAccount(name, uuid, access_token));
+            return new Result<>(ResultType.SUCCESS, new MicrosoftAccount(name, uuid, access_token));
         } catch (IOException | ParseException | URISyntaxException e) {
             Logger.error("Failed to get Minecraft account information", e);
-            return Result.NETWORK_IO_EXCEPTION;
+            return new Result<>(ResultType.NETWORK_IO_EXCEPTION.setData(e));
         } catch (JsonSyntaxException e) {
             Logger.error("Failed to get Minecraft account information", e);
-            return Result.JSON_SYNTAX_EXCEPTION.setData(e);
+            return new Result<>(ResultType.JSON_SYNTAX_EXCEPTION.setData(e));
         }
     }
 }

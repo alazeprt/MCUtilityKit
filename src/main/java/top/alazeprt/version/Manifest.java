@@ -3,6 +3,7 @@ package top.alazeprt.version;
 import org.tinylog.Logger;
 import top.alazeprt.util.HttpUtil;
 import top.alazeprt.util.Result;
+import top.alazeprt.util.ResultType;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import org.apache.hc.core5.http.ParseException;
@@ -62,7 +63,7 @@ public class Manifest {
      *
      * @return the result of the operation
      */
-    public Result reloadData() {
+    public Result<Manifest> reloadData() {
         Logger.info("Reloading manifest from " + url);
         Gson gson = new Gson();
         String data = null;
@@ -71,12 +72,12 @@ public class Manifest {
             this.manifest = gson.fromJson(data, Map.class);
         } catch (IOException | URISyntaxException | ParseException e) {
             Logger.error("Failed to load manifest from " + url, e);
-            return Result.NETWORK_IO_EXCEPTION;
+            return new Result<>(ResultType.NETWORK_IO_EXCEPTION);
         } catch (JsonSyntaxException e) {
             Logger.error("Failed to parse manifest from " + url, e);
-            return Result.JSON_SYNTAX_EXCEPTION.setData(data);
+            return new Result<>(ResultType.JSON_SYNTAX_EXCEPTION.setData(data));
         }
-        return Result.SUCCESS.setData(this);
+        return new Result<>(ResultType.SUCCESS, this);
     }
 
     /**
@@ -93,7 +94,7 @@ public class Manifest {
      *
      * @return the version list
      */
-    public Result getVersionList() {
+    public Result<List<Version>> getVersionList() {
         Logger.info("Getting version list...");
         List<Version> versionList = new ArrayList<>();
         try {
@@ -109,8 +110,8 @@ public class Manifest {
             }
         } catch (NullPointerException e) {
             Logger.error("Failed to get version list", e);
-            return Result.MANIFEST_ERROR.setData(manifest);
+            return new Result<>(ResultType.MANIFEST_ERROR.setData(manifest));
         }
-        return Result.SUCCESS.setData(versionList);
+        return new Result<>(ResultType.SUCCESS, versionList);
     }
 }

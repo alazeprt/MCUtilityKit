@@ -1,11 +1,13 @@
 package top.alazeprt.game;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.tinylog.Logger;
 import top.alazeprt.account.Account;
 import top.alazeprt.account.MicrosoftAccount;
 import top.alazeprt.java.Java;
 import top.alazeprt.util.FileUtil;
 import top.alazeprt.util.Result;
+import top.alazeprt.util.ResultType;
 import top.alazeprt.util.UUIDUtil;
 import top.alazeprt.version.Instance;
 import com.google.gson.Gson;
@@ -31,7 +33,7 @@ public class Vanilla {
      * @param instance the instance
      * @return the result of the operation
      */
-    public static Result extractNatives(Instance instance) {
+    public static Result<File> extractNatives(Instance instance) {
         Logger.info("Extracting native libraries...");
         File root = instance.root();
         Gson gson = new Gson();
@@ -41,7 +43,7 @@ public class Vanilla {
             json = gson.fromJson(new InputStreamReader(
                     new FileInputStream(new File(root, "versions/" + instance.name() + "/" + instance.name() + ".json")), StandardCharsets.UTF_8), Map.class);
         } catch (FileNotFoundException e) {
-            return Result.FILE_IO_EXCEPTION.setData(e);
+            return new Result<>(ResultType.FILE_IO_EXCEPTION.setData(e));
         }
         File librariesFolder = new File(root, "libraries");
         if(!librariesFolder.exists()) {
@@ -117,11 +119,11 @@ public class Vanilla {
                 }
             } catch (IOException e) {
                 Logger.error("Failed to extract " + fileName + ": " + e.getMessage());
-                return Result.FILE_IO_EXCEPTION.setData(e);
+                return new Result<>(ResultType.FILE_IO_EXCEPTION.setData(e));
             }
         }
         Logger.info("Finished extracting native libraries.");
-        return Result.SUCCESS.setData(new File(versionFolder, folderName).getAbsolutePath());
+        return new Result<>(ResultType.SUCCESS.setData(new File(versionFolder, folderName).getAbsolutePath()));
     }
 
     /**
@@ -133,7 +135,7 @@ public class Vanilla {
      * @param nativesFolder the natives folder
      * @return the result of the operation
      */
-    public static Result launch(Java java, Instance instance, Account account, String nativesFolder) {
+    public static Result<ObjectUtils.Null> launch(Java java, Instance instance, Account account, String nativesFolder) {
         Logger.info("Launching game...");
         File root = instance.root();
         Gson gson = new Gson();
@@ -143,7 +145,7 @@ public class Vanilla {
             json = gson.fromJson(new InputStreamReader(
                     new FileInputStream(new File(root, "versions/" + instance.name() + "/" + instance.name() + ".json")), StandardCharsets.UTF_8), Map.class);
         } catch (FileNotFoundException e) {
-            return Result.FILE_IO_EXCEPTION.setData(e);
+            return new Result<>(ResultType.FILE_IO_EXCEPTION.setData(e));
         }
         File libraryFolder = new File(root, "libraries");
         List<Map<String, Map<String, Map<String, Object>>>> libraries = (List<Map<String, Map<String, Map<String, Object>>>>)
@@ -258,7 +260,7 @@ public class Vanilla {
             }
         });
         thread.start();
-        return Result.SUCCESS;
+        return new Result<>(ResultType.SUCCESS);
     }
 
     static class ArgumentHandler {
